@@ -100,7 +100,7 @@ class UploadImgService extends React.Component {
         <img src={this.state.disp_image} onChange={this.handleImageChange} id="image-upload" className="ImageSize"/>
         {console.log(this.state.file)}
         <Button variant="secondary" onClick={this.sendFile} >Post</Button>
-        <Button variant="contained" onClick={this.getFile} >Blur</Button>
+        <Button variant="success" onClick={this.getFile} >Blur</Button>
       </div>
     );
   }
