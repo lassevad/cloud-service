@@ -12,7 +12,6 @@ function App() {
           Lasses computational service
         </h1>
         <ImagePrev className="ImageSize"/>
-        <Button variant="success" >Blur</Button> 
       </header>
     </div>
   );

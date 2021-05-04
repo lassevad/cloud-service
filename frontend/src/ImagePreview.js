@@ -1,6 +1,8 @@
 import React from 'react';
-import {Button} from 'react-bootstrap';
 import axios from 'axios';
+//import 'materialize-css';
+import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
 
 class UploadImgService extends React.Component {
   constructor(props){
@@ -49,13 +51,11 @@ class UploadImgService extends React.Component {
     })
   };
 
+  
   sendFile () {
     var img = this.state.file
-    console.log(this.state.file)
     let id = this.makeId(8);
-    console.log(id)
     this.setCurrentImageId(id);
-    console.log(this.state.image_id)
     this.upload(img, id);
   }
 
@@ -75,16 +75,16 @@ class UploadImgService extends React.Component {
 
   getFile() {
     var id = this.state.image_id
-    console.log(id)
     this.download(id)
   }
 
 
-  handleChange(event) {
-    this.setState({
+  async handleChange(event) {
+    await this.setState({
       file: event.target.files[0],
       disp_image: URL.createObjectURL(event.target.files[0]),
     })
+    this.sendFile()
   }
 
   handleImageChange = (e) => {
@@ -95,13 +95,33 @@ class UploadImgService extends React.Component {
 
   render() {
     return (
+
       <div>
-        <input type="file" onChange={this.handleChange}/>
-        <img src={this.state.disp_image} onChange={this.handleImageChange} id="image-upload" className="ImageSize"/>
-        {console.log(this.state.file)}
-        <Button variant="secondary" onClick={this.sendFile} >Post</Button>
-        <Button variant="success" onClick={this.getFile} >Blur</Button>
+
+        <div class="file-field input-field">
+            <Box display="flex" alignSelf="flex-end" justifyContent="center" className="upl">
+              <span class="btn">Upload</span>
+              <input type="file" multiple class="btn" onChange={this.handleChange}/>
+            </Box>
+            <Box display="flex" justifyContent="center">
+              <img src={this.state.disp_image} onChange={this.handleImageChange} id="image-upload" className="ImageSize"/>
+              {console.log(this.state.file)}
+            </Box>
+            <Box display="flex" justifyContent="center" className="blur">
+              <a class="waves-effect waves-light btn" onClick={this.getFile}>Blur</a>
+            </Box>
+
+        </div>
+
+
+
+
       </div>
+
+      
+
+
+
     );
   }
 }
