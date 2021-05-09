@@ -1,0 +1,19 @@
+{"binaries" : [
+    { 
+        "id": "1",
+        "name": "Sequential",
+        "value": "./main" 
+    },
+    { 
+        "id": "2", 
+        "name": "MPI",
+        "value": "./mpi-par" 
+    },
+    {
+        "id": "3", 
+        "name": "OpenMP",
+        "value": "./main-omp2" 
+    }
+]
+}
+
