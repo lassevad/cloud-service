@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import Select_ from "react-select";
 //import 'materialize-css';
 import Box from '@material-ui/core/Box';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
+
+const API_ROUTE = "http://10.6.129.191:8080"
+
 class UploadImgService extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props)
     this.state = {
       file: null,
@@ -29,10 +30,10 @@ class UploadImgService extends React.Component {
   }
 
   makeId(length) {
-    var result           = [];
-    var characters       = '0123456789';
+    var result = [];
+    var characters = '0123456789';
     var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
+    for (var i = 0; i < length; i++) {
       result.push(characters.charAt(Math.floor(Math.random() * charactersLength)));
     }
     return result.join('');
@@ -52,32 +53,32 @@ class UploadImgService extends React.Component {
 
   upload(img, id) {
     console.log(img)
-    return axios.post("http://localhost:5000/upload?id=" + id, img, {
+    return axios.post(API_ROUTE + "/upload?id=" + id, img, {
       headers: {
         "Content-Type": "image/png",
       }
     })
   };
 
-  uploadBinary(){
-    return axios.post('http://localhost:5000/uploadBinary', {
+  uploadBinary() {
+    return axios.post(API_ROUTE + '/uploadBinary', {
       data: {
-        parallel : this.state.selectedMenuItem
+        parallel: this.state.selectedMenuItem
       },
       headers: {
         'Content-Type': 'application/json'
       }
     })
-    .then(function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 
-  
-  sendFile () {
+
+  sendFile() {
     var img = this.state.file
     let id = this.makeId(8);
     this.setCurrentImageId(id);
@@ -86,16 +87,16 @@ class UploadImgService extends React.Component {
 
 
   download(id) {
-    return axios.get("http://localhost:5000/download?id=" + id, { responseType: 'arraybuffer' })
-    .then(response => {
+    return axios.get(API_ROUTE + "/download?id=" + id, { responseType: 'arraybuffer' })
+      .then(response => {
         let blob = new Blob(
-            [response.data], 
-            { type: response.headers['content-type'] }
+          [response.data],
+          { type: response.headers['content-type'] }
         )
         let image = URL.createObjectURL(blob)
         this.changeDispImage(image)
         return image
-    });
+      });
   }
 
   getFile() {
@@ -103,14 +104,14 @@ class UploadImgService extends React.Component {
     this.download(id)
   }
 
-  getBinaries(){
-    return axios.get("http://localhost:5000/binaries")
-    .then(response => {
-      console.log(response.data.binaries)
-      this.setState({
-        binaries: response.data.binaries
+  getBinaries() {
+    return axios.get(API_ROUTE + "/binaries")
+      .then(response => {
+        console.log(response.data.binaries)
+        this.setState({
+          binaries: response.data.binaries
+        })
       })
-    })
   }
 
   async handleChange(event) {
@@ -127,14 +128,14 @@ class UploadImgService extends React.Component {
     })
   };
 
-  componentDidMount(){
+  componentDidMount() {
     this.getBinaries()
   }
 
-  fillMenu(){
+  fillMenu() {
     let bins = this.state.binaries;
     let menuItems = bins.map((binary) =>
-        <MenuItem value={binary.value} key={binary.name}>{binary.name}</MenuItem>
+      <MenuItem value={binary.value} key={binary.name}>{binary.name}</MenuItem>
     );
     this.setState({
       menuItems: menuItems
@@ -142,7 +143,7 @@ class UploadImgService extends React.Component {
     console.log(this.state.selectedMenuItem)
   }
 
-  setBinary(e){
+  setBinary(e) {
     this.setState({
       selectedMenuItem: e.target.value
     })
@@ -150,39 +151,39 @@ class UploadImgService extends React.Component {
   }
 
   render() {
-      
+
     return (
 
-      <div>  
-      
+      <div>
+
         <InputLabel id="demo-simple-select-label">Binary file</InputLabel>
         <Select
-        onChange={this.setBinary}>
+          onChange={this.setBinary}>
           {this.state.menuItems}
         </Select>
 
 
-    
+
         <div class="file-field input-field">
-            <Box display="flex" alignSelf="flex-end" justifyContent="center" className="upl">
-              <span class="btn">Upload</span>
-              <input type="file" multiple class="btn" onChange={this.handleChange}/>
-            </Box>
-            <Box display="flex" justifyContent="center">
-              <img src={this.state.disp_image} onChange={this.handleImageChange} id="image-upload" className="ImageSize"/>
-              {console.log(this.state.file)}
-            </Box>
-            <Box display="flex" justifyContent="center" className="blur">
-              <a class="waves-effect waves-light btn" onClick={this.getFile}>Blur</a>
-              <a class="waves-effect waves-light btn" onClick={this.fillMenu}>fill menu</a>
-              <a class="waves-effect waves-light btn" onClick={this.uploadBinary}>send binary</a>
-            </Box>
+          <Box display="flex" alignSelf="flex-end" justifyContent="center" className="upl">
+            <span class="btn">Upload</span>
+            <input type="file" multiple class="btn" onChange={this.handleChange} />
+          </Box>
+          <Box display="flex" justifyContent="center">
+            <img src={this.state.disp_image} onChange={this.handleImageChange} id="image-upload" className="ImageSize" />
+            {console.log(this.state.file)}
+          </Box>
+          <Box display="flex" justifyContent="center" className="blur">
+            <a class="waves-effect waves-light btn" onClick={this.getFile}>Blur</a>
+            <a class="waves-effect waves-light btn" onClick={this.fillMenu}>fill menu</a>
+            <a class="waves-effect waves-light btn" onClick={this.uploadBinary}>send binary</a>
+          </Box>
 
         </div>
 
       </div>
 
-      
+
 
 
 

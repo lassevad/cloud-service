@@ -62,4 +62,5 @@ def api_all():
     return jsonify(binaries)
 
 
-app.run()
+app.run(host='0.0.0.0', port=8080)
+
