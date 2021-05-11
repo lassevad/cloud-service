@@ -4,9 +4,19 @@ from flask_cors import CORS, cross_origin
 from flask import jsonify
 import os
 import json
+import pandas as pd
+import os.path
+
+
 
 with open('data.json') as f:
     binaries = json.load(f)
+
+with open('strategies.json') as f:
+    strategies = json.load(f)
+
+
+
 
 UPLOAD_FOLDER = '/uploads'
 ALLOWED_EXTENSIONS = set(['png'])
@@ -49,6 +59,23 @@ def upload_image():
     process_image(image_id)
     return "Image recieved"
 
+@ app.route('/csv', methods=['POST'])
+@ cross_origin()
+def upload_csv():
+    global df
+    global columns
+    print(request.data)
+    with open("dataset.csv", "wb") as file:
+        file.write(request.data)
+        file.close
+    df = pd.read_csv("dataset.csv")
+    columns = list(df.columns)
+    print(df)
+    print(columns)
+    columns = json.dumps(columns)
+    print(columns)
+    return "csv recieved"
+
 
 @ app.route('/download', methods=['GET'])
 def download_image():
@@ -60,6 +87,14 @@ def download_image():
 @ app.route('/binaries', methods=['GET'])
 def api_all():
     return jsonify(binaries)
+
+@ app.route('/strategies', methods=['GET'])
+def api_all_1():
+    return jsonify(strategies)
+
+@ app.route('/columns', methods=['GET'])
+def api_all_2():
+    return columns
 
 
 app.run(host='0.0.0.0', port=8080)

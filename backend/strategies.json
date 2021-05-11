@@ -1,0 +1,40 @@
+{
+    "strategies": [
+        {
+            "id": "1",
+            "name": "Scatter"
+        },
+        {
+            "id": "2",
+            "name": "ScatterReg"
+        },
+        {
+            "id": "3",
+            "name": "Line"
+        },
+        {
+            "id": "4",
+            "name": "Bar"
+        },
+        {
+            "id": "5",
+            "name": "Histogram"
+        },
+        {
+            "id": "6",
+            "name": "Correlogram"
+        },
+        {
+            "id": "7",
+            "name": "Box"
+        },
+        {
+            "id": "8",
+            "name": "Density"
+        },
+        {
+            "id": "9",
+            "name": "Violin"
+        }
+    ]
+}

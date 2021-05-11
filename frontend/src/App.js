@@ -1,7 +1,8 @@
-import React , { useState, useEffect, Component  } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import './App.css';
 import ImagePrev from './ImagePreview.js';
-import { Button} from 'react-bootstrap';
+import GraphService from './Graph.js';
+import { Button } from 'react-bootstrap';
 const axios = require('axios');
 
 function App() {
@@ -11,10 +12,11 @@ function App() {
         <h1>
           Lasses computational service
         </h1>
-        <ImagePrev className="ImageSize"/>
+        <ImagePrev className="ImageSize" />
+        <GraphService />
       </header>
     </div>
   );
- 
+
 }
-  export default App;
+export default App;

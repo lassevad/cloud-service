@@ -77,14 +77,12 @@ class UploadImgService extends React.Component {
       });
   }
 
-
   sendFile() {
     var img = this.state.file
     let id = this.makeId(8);
     this.setCurrentImageId(id);
     this.upload(img, id);
   }
-
 
   download(id) {
     return axios.get(API_ROUTE + "/download?id=" + id, { responseType: 'arraybuffer' })
@@ -107,7 +105,7 @@ class UploadImgService extends React.Component {
   getBinaries() {
     return axios.get(API_ROUTE + "/binaries")
       .then(response => {
-        console.log(response.data.binaries)
+        console.log(typeof response.data.binaries)
         this.setState({
           binaries: response.data.binaries
         })
