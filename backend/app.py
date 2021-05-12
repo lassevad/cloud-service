@@ -6,7 +6,13 @@ import os
 import json
 import pandas as pd
 import os.path
+from framework import *
 
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib import pyplot
+
+df = pd.read_csv("dataset.csv")
 
 
 with open('data.json') as f:
@@ -14,7 +20,6 @@ with open('data.json') as f:
 
 with open('strategies.json') as f:
     strategies = json.load(f)
-
 
 
 
@@ -32,9 +37,46 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @cross_origin()
 def upload_binary():
     global binary
+    print("hei")
     print(request.json["data"]["parallel"])
     binary = request.json["data"]["parallel"]
     return "Binary recieved"
+
+@app.route('/uploadStrategy', methods=['POST'])
+@cross_origin()
+def upload_strategy():
+    global strategy
+    strategy_id = int(request.json["data"]["strategy"]) - 1
+    print("strategy = " + strategies["strategies"][strategy_id]["value"])
+    strategy = strategies["strategies"][strategy_id]["value"]
+    return "Strategy recieved"
+
+@app.route('/uploadCol1', methods=['POST'])
+@cross_origin()
+def upload_col1():
+    global col1
+    print(columns)
+    col1 = columns[int(request.json["data"]["col1"])]
+    print("col1 = " + col1)
+    return "col1 recieved"
+
+@app.route('/uploadCol2', methods=['POST'])
+@cross_origin()
+def upload_col2():
+    global col2
+    print(columns)
+    col2 = columns[int(request.json["data"]["col2"])]
+    print("col2 = " + col2)
+    return "col2 recieved"
+
+@app.route('/uploadHue', methods=['POST'])
+@cross_origin()
+def upload_hue():
+    global hue
+    print(columns)
+    hue = columns[int(request.json["data"]["hue"])]
+    print("hue = " + hue)
+    return "hue recieved"
 
 
 def process_image(image_id):
@@ -70,9 +112,6 @@ def upload_csv():
         file.close
     df = pd.read_csv("dataset.csv")
     columns = list(df.columns)
-    print(df)
-    print(columns)
-    columns = json.dumps(columns)
     print(columns)
     return "csv recieved"
 
@@ -82,6 +121,16 @@ def download_image():
     image_id = request.args.get('id')
     print(request.data)
     return send_file('uploads/' + image_id + '.png', mimetype='image/gif')
+
+@ app.route('/generateGraph', methods=['GET'])
+def generate_graph():
+    print(strategy)
+    print(eval(strategy))
+    con = Context(eval(strategy), df)
+    fig = con.plot(col1, col2, hue)
+    fig.figure.savefig("graph.png")
+
+    return send_file('graph.png', mimetype='image/gif')
 
 
 @ app.route('/binaries', methods=['GET'])
@@ -94,8 +143,12 @@ def api_all_1():
 
 @ app.route('/columns', methods=['GET'])
 def api_all_2():
-    return columns
+    return jsonify(columns)
+
+
 
 
 app.run(host='0.0.0.0', port=8080)
+
+
 

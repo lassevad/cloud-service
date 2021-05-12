@@ -18,7 +18,8 @@ class GraphService extends React.Component {
             colItems: null,
             selectedCol1Item: null,
             selectedCol2Item: null,
-            selectedHueItem: null
+            selectedHueItem: null,
+            disp_image: null
         }
         this.handleChange = this.handleChange.bind(this)
         this.getStrategies = this.getStrategies.bind(this)
@@ -26,6 +27,12 @@ class GraphService extends React.Component {
         this.fillStrategies = this.fillStrategies.bind(this)
         this.componentDidMount = this.componentDidMount.bind(this)
         this.getColumns = this.getColumns.bind(this)
+        this.sendGraphInfo = this.sendGraphInfo.bind(this)
+        this.setCol1 = this.setCol1.bind(this)
+        this.setCol2 = this.setCol2.bind(this)
+        this.setHue = this.setHue.bind(this)
+        this.changeDispImage = this.changeDispImage.bind(this)
+        this.generateGraph = this.generateGraph.bind(this)
 
     }
 
@@ -37,6 +44,12 @@ class GraphService extends React.Component {
             result.push(characters.charAt(Math.floor(Math.random() * charactersLength)));
         }
         return result.join('');
+    }
+
+    changeDispImage(newImage) {
+        this.setState({
+            disp_image: newImage
+        });
     }
 
     uploadcsv() {
@@ -54,6 +67,74 @@ class GraphService extends React.Component {
             });
     };
 
+    uploadStrategy() {
+        return axios.post(API_ROUTE + '/uploadStrategy', {
+            data: {
+                strategy: this.state.selectedStrategy
+            },
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    uploadCol1() {
+        return axios.post(API_ROUTE + '/uploadCol1', {
+            data: {
+                col1: this.state.selectedCol1Item
+            },
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    uploadCol2() {
+        return axios.post(API_ROUTE + '/uploadCol2', {
+            data: {
+                col2: this.state.selectedCol2Item
+            },
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    uploadHue() {
+        return axios.post(API_ROUTE + '/uploadHue', {
+            data: {
+                hue: this.state.selectedHueItem
+            },
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
     getStrategies() {
         return axios.get(API_ROUTE + "/strategies")
             .then(response => {
@@ -69,22 +150,12 @@ class GraphService extends React.Component {
         return axios.get(API_ROUTE + "/columns")
             .then(response => {
                 console.log(response.data)
-                this.populateColumns(response.data)
+                this.fillColumns(response.data)
             })
     }
 
-    populateColumns(columns) {
-        console.log(columns)
-        let menuItems = columns.map((index, option) => (
-            <MenuItem key={option} value={index}>{index}</MenuItem>
-        ));
-        this.setState({
-            columns: menuItems
-        })
-        console.log(this.state.columns)
-    }
-
     setStrategy(e) {
+        console.log(e.target)
         this.setState({
             selectedStrategy: e.target.value
         })
@@ -108,6 +179,30 @@ class GraphService extends React.Component {
         })
     }
 
+    sendGraphInfo() {
+        this.uploadStrategy()
+        this.uploadCol1()
+        this.uploadCol2()
+        this.uploadHue()
+    }
+
+    generateGraph() {
+        return axios.get(API_ROUTE + "/generateGraph", { responseType: 'arraybuffer' })
+            .then(response => {
+                console.log(response)
+                let blob = new Blob(
+                    [response.data],
+                    { type: response.headers['content-type'] }
+                )
+
+                let image = URL.createObjectURL(blob)
+                console.log(image)
+
+                this.changeDispImage(image)
+                return image
+            });
+    }
+
     fillStrategies() {
         let strats = this.state.strategies;
         let menuItems = strats.map((strategy) =>
@@ -116,6 +211,17 @@ class GraphService extends React.Component {
         this.setState({
             strategyItems: menuItems
         })
+    }
+
+    fillColumns(columns) {
+        console.log(columns)
+        let menuItems = columns.map((index, value) => (
+            <MenuItem key={index} value={value}>{index}</MenuItem>
+        ));
+        this.setState({
+            columns: menuItems
+        })
+        console.log(this.state.columns)
     }
 
     async handleChange(event) {
@@ -127,8 +233,6 @@ class GraphService extends React.Component {
 
     async componentDidMount() {
         await this.getStrategies()
-        await this.getColumns()
-
     }
 
     render() {
@@ -159,6 +263,12 @@ class GraphService extends React.Component {
                         <span class="btn">Upload</span>
                         <input type="file" multiple class="btn" onChange={this.handleChange} />
                         <a class="waves-effect waves-light btn" onClick={this.fillStrategies}>fill strategies</a>
+                        <a class="waves-effect waves-light btn" onClick={this.getColumns}>fill columns</a>
+                        <a class="waves-effect waves-light btn" onClick={this.sendGraphInfo}>Send Graph info</a>
+                        <a class="waves-effect waves-light btn" onClick={this.generateGraph}>Do stuff</a>
+                    </Box>
+                    <Box display="flex" justifyContent="center">
+                        <img src={this.state.disp_image} id="graph-upload" className="ImageSize" />
                     </Box>
                 </div>
 

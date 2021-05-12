@@ -2,39 +2,48 @@
     "strategies": [
         {
             "id": "1",
-            "name": "Scatter"
+            "name": "Scatter",
+            "value": "ScatterStrategy()"
         },
         {
             "id": "2",
-            "name": "ScatterReg"
+            "name": "ScatterReg",
+            "value": "ScatterRegStrategy()"
         },
         {
             "id": "3",
-            "name": "Line"
+            "name": "Line",
+            "value": "LineStrategy()"
         },
         {
             "id": "4",
-            "name": "Bar"
+            "name": "Bar",
+            "value": "BarStrategy()"
         },
         {
             "id": "5",
-            "name": "Histogram"
+            "name": "Histogram",
+            "value": "HistStrategy()"
         },
         {
             "id": "6",
-            "name": "Correlogram"
+            "name": "Correlogram",
+            "value": "CorrelogramStrategy()"
         },
         {
             "id": "7",
-            "name": "Box"
+            "name": "Box",
+            "value": "BoxStrategy()"
         },
         {
             "id": "8",
-            "name": "Density"
+            "name": "Density",
+            "value": "DensityStrategy()"
         },
         {
             "id": "9",
-            "name": "Violin"
+            "name": "Violin",
+            "value": "ViolinStrategy()"
         }
     ]
 }
