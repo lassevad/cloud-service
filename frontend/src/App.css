@@ -38,8 +38,8 @@
 }
 
 .ImageSize {
-  max-height: 250px;
-  max-width: 500px;
+  max-height: 500px;
+  max-width: 1000px;
 }
 
 .FileButton {

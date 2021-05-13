@@ -179,30 +179,31 @@ class GraphService extends React.Component {
         })
     }
 
-    sendGraphInfo() {
-        this.uploadStrategy()
-        this.uploadCol1()
-        this.uploadCol2()
-        this.uploadHue()
+    async sendGraphInfo() {
+        await this.uploadStrategy()
+        await this.uploadCol1()
+        await this.uploadCol2()
+        await this.uploadHue()
+        this.generateGraph()
     }
 
     generateGraph() {
         return axios.get(API_ROUTE + "/generateGraph", { responseType: 'arraybuffer' })
             .then(response => {
                 console.log(response)
-                let blob = new Blob(
+                var blob = new Blob(
                     [response.data],
                     { type: response.headers['content-type'] }
                 )
 
-                let image = URL.createObjectURL(blob)
+                var image = URL.createObjectURL(blob)
                 console.log(image)
 
                 this.changeDispImage(image)
+                console.log(this.state.disp_image)
                 return image
             });
     }
-
     fillStrategies() {
         let strats = this.state.strategies;
         let menuItems = strats.map((strategy) =>
@@ -226,13 +227,17 @@ class GraphService extends React.Component {
 
     async handleChange(event) {
         await this.setState({
-            csvfile: event.target.files[0]
+            csvfile: event.target.files[0],
+            disp_image: URL.createObjectURL(event.target.files[0])
         })
-        this.uploadcsv()
+        await this.uploadcsv()
+        this.getColumns()
     }
 
     async componentDidMount() {
         await this.getStrategies()
+        this.fillStrategies()
+
     }
 
     render() {
@@ -262,13 +267,10 @@ class GraphService extends React.Component {
                     <Box display="flex" alignSelf="flex-end" justifyContent="center" className="upl">
                         <span class="btn">Upload</span>
                         <input type="file" multiple class="btn" onChange={this.handleChange} />
-                        <a class="waves-effect waves-light btn" onClick={this.fillStrategies}>fill strategies</a>
-                        <a class="waves-effect waves-light btn" onClick={this.getColumns}>fill columns</a>
-                        <a class="waves-effect waves-light btn" onClick={this.sendGraphInfo}>Send Graph info</a>
-                        <a class="waves-effect waves-light btn" onClick={this.generateGraph}>Do stuff</a>
+                        <a class="waves-effect waves-light btn" onClick={this.sendGraphInfo}>Create Graph</a>
                     </Box>
                     <Box display="flex" justifyContent="center">
-                        <img src={this.state.disp_image} id="graph-upload" className="ImageSize" />
+                        <img src={this.state.disp_image} onChange={this.changeDispImage} id="graph-upload" className="ImageSize" />
                     </Box>
                 </div>
 

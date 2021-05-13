@@ -74,8 +74,10 @@ def upload_col2():
 def upload_hue():
     global hue
     print(columns)
+
     hue = columns[int(request.json["data"]["hue"])]
-    print("hue = " + hue)
+
+    print("hue: " + hue)
     return "hue recieved"
 
 
@@ -124,10 +126,17 @@ def download_image():
 
 @ app.route('/generateGraph', methods=['GET'])
 def generate_graph():
-    print(strategy)
     print(eval(strategy))
     con = Context(eval(strategy), df)
+
     fig = con.plot(col1, col2, hue)
+
+    filename = "graph.png"
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
+
     fig.figure.savefig("graph.png")
 
     return send_file('graph.png', mimetype='image/gif')
