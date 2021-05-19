@@ -24,6 +24,16 @@
             "id": "5",
             "name": "cividis",
             "value": "cividis"
+        },
+        {
+            "id": "6",
+            "name": "Greens",
+            "value": "Greens"
+        },
+        {
+            "id": "7",
+            "name": "Blues",
+            "value": "Blues"
         }
     ]
 }

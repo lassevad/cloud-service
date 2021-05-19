@@ -150,19 +150,24 @@ class ViolinStrategy(PlotStrategy):
 # Geo Map strategies
 class WebmapStrategy(MapStrategy):
     def geoPlot(self, gdf, h, cmap):
-        ax = gplt.webmap(world_data, figsize=(20,15), projection=gcrs.WebMercator())
-        print(type(gdf))
-        return gplt.pointplot(gdf, ax=ax, hue=h, cmap=cmap, scale=h)
+        ax = gplt.webmap(world_data, figsize=(15,10), projection=gcrs.WebMercator())
+        return gplt.pointplot(gdf, ax=ax, hue=h, cmap=cmap)
 
 class PolymapStrategy(MapStrategy):
     def geoPlot(self, gdf, h, cmap):
-        ax = gplt.polyplot(world_data, figsize=(20,15), projection=gcrs.WebMercator())
-        return gplt.pointplot(gdf, ax=ax, hue=h, cmap=cmap, scale=h)
+        ax = gplt.polyplot(world_data, figsize=(15,10), projection=gcrs.WebMercator())
+        return gplt.pointplot(gdf, ax=ax, hue=h, cmap=cmap)
 
 class KdeStrategy(MapStrategy):
     def geoPlot(self, gdf, h, cmap):
-        ax = gplt.polyplot(world_data, figsize=(20,15), projection=gcrs.WebMercator())
-        return gplt.kdeplot(gdf, ax=ax, hue=h, cmap=cmap, scale=h)
+        ax = gplt.polyplot(world_data, figsize=(15,10), projection=gcrs.WebMercator())
+        return gplt.kdeplot(gdf, ax=ax, hue=h, cmap=cmap)
+
+class ChoroplethStrategy(MapStrategy):
+    def geoPlot(self, gdf, h, cmap):
+        ax = gplt.polyplot(world_data, figsize=(15,10), projection=gcrs.WebMercator())
+        return gplt.choropleth(gdf, ax=ax, hue=h, cmap=cmap, legend=True)
+
 
 #if __name__ == "__main__":
 
