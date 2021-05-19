@@ -1,0 +1,19 @@
+{
+    "maps": [
+        {
+            "id": "1",
+            "name": "Polymap",
+            "value": "PolymapStrategy()"
+        },
+        {
+            "id": "2",
+            "name": "Webmap",
+            "value": "WebmapStrategy()"
+        },
+        {
+            "id": "3",
+            "name": "Kde",
+            "value": "KdeStrategy()"
+        }
+    ]
+}

@@ -1,15 +1,29 @@
 import pandas as pd
+import geopandas as gpd
 import os.path
-
+import geoplot as gplt
 import seaborn as sns
 from matplotlib import pyplot as plt
 
 
+import datapackage
+import requests
+from shapely.geometry import shape
+import geoplot.crs as gcrs
+
 df = pd.read_csv("dataset.csv")
+gdf = gpd.read_file("geodataset.csv", GEOM_POSSIBLE_NAMES="geometry", KEEP_GEOM_COLUMNS="NO") 
+
+world_data = gpd.read_file("shapes/world.shp")
+world_data = world_data[["NAME", "geometry"]]
 
 
 class PlotStrategy():
     def plot(self, col1, col2, df, h):
+        pass
+
+class MapStrategy():
+    def geoPlot(self, gdf, h):
         pass
 
 
@@ -64,6 +78,30 @@ class Context():
         pyplot.locator_params(axis='x', nbins=x)
 
 
+
+
+class MapContext():
+    def __init__(self, mapstrategy: MapStrategy, gdf):
+        self._mapstrategy = mapstrategy
+        self._gdf = gdf
+
+    def getMapStrategy(self):
+        return self._mapstrategy
+
+    def setMapStrategy(self, mapstrategy):
+        self._mapstrategy = mapstrategy
+
+    def getGeoDataFrame(self):
+        return self._gdf
+
+    def setGeoDataFrame(self, gdf):
+        self._gdf = gdf
+
+    def geoPlot(self, h=None, cmap=None):
+        print("Context: Plotting data using the mapstrategy")
+        return self._mapstrategy.geoPlot(self.getGeoDataFrame(), h, cmap)
+
+
 class ScatterStrategy(PlotStrategy):
     def plot(self, col1, col2, df, h):
         return sns.scatterplot(x=col1, y=col2, data=df, hue=h, size=h, sizes=(30, 200))
@@ -109,7 +147,24 @@ class ViolinStrategy(PlotStrategy):
         return sns.violinplot(data=df, x=col1, y=col2, hue=h)
 
 
-if __name__ == "__main__":
+# Geo Map strategies
+class WebmapStrategy(MapStrategy):
+    def geoPlot(self, gdf, h, cmap):
+        ax = gplt.webmap(world_data, figsize=(20,15), projection=gcrs.WebMercator())
+        print(type(gdf))
+        return gplt.pointplot(gdf, ax=ax, hue=h, cmap=cmap, scale=h)
+
+class PolymapStrategy(MapStrategy):
+    def geoPlot(self, gdf, h, cmap):
+        ax = gplt.polyplot(world_data, figsize=(20,15), projection=gcrs.WebMercator())
+        return gplt.pointplot(gdf, ax=ax, hue=h, cmap=cmap, scale=h)
+
+class KdeStrategy(MapStrategy):
+    def geoPlot(self, gdf, h, cmap):
+        ax = gplt.polyplot(world_data, figsize=(20,15), projection=gcrs.WebMercator())
+        return gplt.kdeplot(gdf, ax=ax, hue=h, cmap=cmap, scale=h)
+
+#if __name__ == "__main__":
 
     #pga.removeCharFromColumn(',', "Money")
     #pga.removeCharFromColumn('$', "Money")
@@ -117,7 +172,6 @@ if __name__ == "__main__":
     #pga.removeCharFromColumn(',', "Points")
     # pga.convertToFloat("Points")
 
-    con = Context(app.strategy, df)
-    fig = con.plot(app.col1, app.col2, app.hue)
-    fig.savefig("graph.png")
-
+    #con = Context(app.strategy, df)
+    #fig = con.plot(app.col1, app.col2, app.hue)
+    #fig.savefig("graph.png")

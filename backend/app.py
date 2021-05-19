@@ -7,6 +7,9 @@ import json
 import pandas as pd
 import os.path
 from framework import *
+import geoplot as gplt
+import geopandas as gpd
+
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -14,6 +17,15 @@ from matplotlib import pyplot
 
 df = pd.read_csv("dataset.csv")
 
+#gdf = gpd.read_file("geodataset.csv", GEOM_POSSIBLE_NAMES="geometry", KEEP_GEOM_COLUMNS="NO") 
+
+#gdf.crs = 'epsg:4326'
+
+#from shapely import wkt
+
+#df1['geometry'] = df1['geometry'].apply(wkt.loads)
+#gdf = gpd.GeoDataFrame(df1, crs='epsg:4326')
+#print(gdf.head())
 
 with open('data.json') as f:
     binaries = json.load(f)
@@ -21,7 +33,11 @@ with open('data.json') as f:
 with open('strategies.json') as f:
     strategies = json.load(f)
 
+with open('maps.json') as f:
+    maps = json.load(f)
 
+with open('cmaps.json') as f:
+    cmaps = json.load(f)
 
 UPLOAD_FOLDER = '/uploads'
 ALLOWED_EXTENSIONS = set(['png'])
@@ -51,6 +67,25 @@ def upload_strategy():
     strategy = strategies["strategies"][strategy_id]["value"]
     return "Strategy recieved"
 
+@app.route('/uploadMap', methods=['POST'])
+@cross_origin()
+def upload_map():
+    global _map
+    print(request.json)
+    map_id = int(request.json["data"]["map"]) - 1
+    print("map = " + maps["maps"][map_id]["value"])
+    _map = maps["maps"][map_id]["value"]
+    return "map recieved"
+
+@app.route('/uploadColorMap', methods=['POST'])
+@cross_origin()
+def upload_cmap():
+    global cmap
+    cmap_id = int(request.json["data"]["cmap"]) - 1
+    print("cmap = " + cmaps["cmaps"][cmap_id]["value"])
+    cmap = cmaps["cmaps"][cmap_id]["value"]
+    return "cmap recieved"
+
 @app.route('/uploadCol1', methods=['POST'])
 @cross_origin()
 def upload_col1():
@@ -79,6 +114,17 @@ def upload_hue():
 
     print("hue: " + hue)
     return "hue recieved"
+
+@app.route('/uploadGeoHue', methods=['POST'])
+@cross_origin()
+def upload_geohue():
+    global geohue
+    print(geocolumns)
+
+    geohue = geocolumns[int(request.json["data"]["geohue"])]
+
+    print("geohue: " + geohue)
+    return "geohue recieved"
 
 
 def process_image(image_id):
@@ -117,6 +163,20 @@ def upload_csv():
     print(columns)
     return "csv recieved"
 
+@ app.route('/geocsv', methods=['POST'])
+@ cross_origin()
+def upload_geocsv():
+    global gdf
+    global geocolumns
+    print(request.data)
+    with open("geodataset.csv", "wb") as file:
+        file.write(request.data)
+        file.close
+    gdf = gpd.read_file("geodataset.csv", GEOM_POSSIBLE_NAMES="geometry", KEEP_GEOM_COLUMNS="NO") 
+    df_ = pd.read_csv("geodataset.csv")
+    geocolumns = list(df_.columns)
+    print(geocolumns)
+    return "geocsv recieved"
 
 @ app.route('/download', methods=['GET'])
 def download_image():
@@ -141,6 +201,22 @@ def generate_graph():
 
     return send_file('graph.png', mimetype='image/gif')
 
+@ app.route('/generateMap', methods=['GET'])
+def generate_map():
+    print(eval(_map))
+    geocon = MapContext(eval(_map), gdf)
+
+    geofig = geocon.geoPlot(geohue, cmap)
+
+    filename = "map.png"
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
+
+    geofig.figure.savefig("map.png")
+
+    return send_file('map.png', mimetype='image/gif')
 
 @ app.route('/binaries', methods=['GET'])
 def api_all():
@@ -150,10 +226,21 @@ def api_all():
 def api_all_1():
     return jsonify(strategies)
 
+@ app.route('/maps', methods=['GET'])
+def get_maps():
+    return jsonify(maps)
+
 @ app.route('/columns', methods=['GET'])
 def api_all_2():
     return jsonify(columns)
 
+@ app.route('/geocolumns', methods=['GET'])
+def get_geocolumns():
+    return jsonify(geocolumns)
+
+@ app.route('/colormaps', methods=['GET'])
+def get_cmaps():
+    return jsonify(cmaps)
 
 
 

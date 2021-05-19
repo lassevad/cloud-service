@@ -1,0 +1,29 @@
+{
+    "cmaps": [
+        {
+            "id": "1",
+            "name": "viridis",
+            "value": "viridis"
+        },
+        {
+            "id": "2",
+            "name": "plasma",
+            "value": "plasma"
+        },
+        {
+            "id": "3",
+            "name": "inferno",
+            "value": "inferno"
+        },
+        {
+            "id": "4",
+            "name": "magma",
+            "value": "magma"
+        },
+        {
+            "id": "5",
+            "name": "cividis",
+            "value": "cividis"
+        }
+    ]
+}
