@@ -77,8 +77,31 @@ class Context():
         pyplot.locator_params(axis='y', nbins=y)
         pyplot.locator_params(axis='x', nbins=x)
 
+    def supervised(self, df, col, fn):
+        _fn = fn
+        X_train, X_test, Y_train, Y_test = train_test_split(self._df[_fn], df[col], random_state=0)
+        model = GaussianNB()
+        model.fit(X_train,Y_train)
+        Y_pred = model.predict(X_test)
+        accuracy_score = metrics.accuracy_score(Y_test, Y_pred)
+        print(accuracy_score)
+        return accuracy_score
 
+    def unsupervised(self, df, fn):
+        _fn = fn
+        X_train, X_test, Y_train, Y_test = train_test_split(self._df[_fn], df[col], random_state=0)
+        kmeans = KMeans(n_clusters=3)
+        kmeans.fit(df)
+        plt.scatter(df.values[:,0],df.values[:,1], c=kmeans.labels_, cmap='rainbow')
 
+    def regression(self, df, fn):
+        _fn = fn
+        X_train, X_test, Y_train, Y_test = train_test_split(self._df[_fn], df[col], random_state=0)
+        slRegressor = LinearRegression().fit(X_train, Y_train)
+        Y_pred = slRegressor.predict(X_test)
+        r_sq = slRegressor.score(X_train, Y_train)
+        print('coefficient of determination:', r_sq)
+        return r_sq
 
 class MapContext():
     def __init__(self, mapstrategy: MapStrategy, gdf):
