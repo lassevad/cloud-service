@@ -78,28 +78,34 @@ class Context():
         pyplot.locator_params(axis='x', nbins=x)
 
     def supervised(self, df, col, fn):
-        _fn = fn
-        X_train, X_test, Y_train, Y_test = train_test_split(self._df[_fn], df[col], random_state=0)
+        X_train, X_test, Y_train, Y_test = train_test_split(df1[fn], df[col], random_state=1)
         model = GaussianNB()
         model.fit(X_train,Y_train)
+        GaussianNB(priors=None)
         Y_pred = model.predict(X_test)
-        accuracy_score = metrics.accuracy_score(Y_test, Y_pred)
-        print(accuracy_score)
-        return accuracy_score
+        print(metrics.classification_report(Y_test, Y_pred))
+        return metrics.classification_report(Y_test, Y_pred)
 
     def unsupervised(self, df, fn):
-        _fn = fn
-        X_train, X_test, Y_train, Y_test = train_test_split(self._df[_fn], df[col], random_state=0)
+        x = df.iloc[:, [0,1]].values
         kmeans = KMeans(n_clusters=3)
-        kmeans.fit(df)
-        plt.scatter(df.values[:,0],df.values[:,1], c=kmeans.labels_, cmap='rainbow')
+        y_kmeans = kmeans.fit_predict(x)
+        plt.scatter(x[:,0],x[:,1], c=y_kmeans, cmap='rainbow')
+        return plt.scatter(x[:,0],x[:,1], c=y_kmeans, cmap='rainbow')
 
     def regression(self, df, fn):
-        _fn = fn
-        X_train, X_test, Y_train, Y_test = train_test_split(self._df[_fn], df[col], random_state=0)
-        slRegressor = LinearRegression().fit(X_train, Y_train)
-        Y_pred = slRegressor.predict(X_test)
-        r_sq = slRegressor.score(X_train, Y_train)
+
+        x = df[fn].iloc[:, :-1].values
+        y = df[fn].iloc[:, 1].values
+        X_train, X_test, Y_train, Y_test = train_test_split(x, y)
+
+        lr = LinearRegression().fit(X_train, Y_train)
+        Y_pred = lr.predict(X_test)
+        r_sq = lr.score(X_train, Y_train)
+
+        plt.scatter(X_test, Y_test, color = "green")
+        plt.plot(X_test, Y_pred, color = "Red")
+        plt.show()
         print('coefficient of determination:', r_sq)
         return r_sq
 
