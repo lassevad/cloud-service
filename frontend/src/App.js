@@ -1,8 +1,6 @@
 import React, { useState, useEffect, Component } from 'react';
 import './App.css';
 import ImagePrev from './ImagePreview.js';
-import GraphService from './Graph.js';
-import MapService from './Map.js';
 import { Button } from 'react-bootstrap';
 const axios = require('axios');
 
@@ -14,8 +12,6 @@ function App() {
           Graphalicious
         </h1>
         <ImagePrev className="ImageSize" />
-        <GraphService />
-        <MapService />
       </header>
     </div>
   );

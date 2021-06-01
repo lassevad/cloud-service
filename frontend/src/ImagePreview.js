@@ -6,7 +6,7 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 
-const API_ROUTE = "http://10.6.129.191:8080"
+const API_ROUTE = "http://10.6.129.215:8080"
 
 class UploadImgService extends React.Component {
   constructor(props) {
@@ -15,10 +15,15 @@ class UploadImgService extends React.Component {
       file: null,
       image: null,
       disp_image: null,
+      disp_image_graph: null,
       image_id: 0,
       binaries: null,
       menuItems: null,
-      selectedMenuItem: null
+      selectedMenuItem: null,
+      process_time: null,
+      N: null,
+      NItems: null,
+      selectedNItem: null
     }
     this.handleChange = this.handleChange.bind(this)
     this.makeId = this.makeId.bind(this)
@@ -27,6 +32,7 @@ class UploadImgService extends React.Component {
     this.fillMenu = this.fillMenu.bind(this)
     this.setBinary = this.setBinary.bind(this)
     this.uploadBinary = this.uploadBinary.bind(this)
+    this.setN = this.setN.bind(this)
   }
 
   makeId(length) {
@@ -51,9 +57,15 @@ class UploadImgService extends React.Component {
     });
   }
 
-  upload(img, id) {
+  changeDispImageGraph(newImage) {
+    this.setState({
+      disp_image_graph: newImage
+    });
+  }
+
+  async upload(img, id) {
     console.log(img)
-    return axios.post(API_ROUTE + "/upload?id=" + id, img, {
+    await axios.post(API_ROUTE + "/upload?id=" + id, img, {
       headers: {
         "Content-Type": "image/png",
       }
@@ -64,6 +76,23 @@ class UploadImgService extends React.Component {
     return axios.post(API_ROUTE + '/uploadBinary', {
       data: {
         parallel: this.state.selectedMenuItem
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  uploadN() {
+    return axios.post(API_ROUTE + '/uploadN', {
+      data: {
+        n: this.state.selectedNItem
       },
       headers: {
         'Content-Type': 'application/json'
@@ -97,9 +126,30 @@ class UploadImgService extends React.Component {
       });
   }
 
-  getFile() {
+  generateGraph() {
+    return axios.get(API_ROUTE + "/generateGraph", { responseType: 'arraybuffer' })
+      .then(response => {
+        console.log(response)
+        var blob = new Blob(
+          [response.data],
+          { type: response.headers['content-type'] }
+        )
+
+        var image = URL.createObjectURL(blob)
+        console.log(image)
+
+        this.changeDispImageGraph(image)
+        console.log(this.state.disp_image_graph)
+        return image
+      });
+  }
+
+  async getFile() {
+    await this.uploadBinary()
     var id = this.state.image_id
     this.download(id)
+    this.getProcessTime()
+    this.generateGraph()
   }
 
   getBinaries() {
@@ -108,6 +158,27 @@ class UploadImgService extends React.Component {
         console.log(typeof response.data.binaries)
         this.setState({
           binaries: response.data.binaries
+        })
+      })
+  }
+
+  getN() {
+    return axios.get(API_ROUTE + "/n")
+      .then(res => {
+        console.log(res.data)
+        console.log(res.data.processes)
+        this.setState({
+          N: res.data.processes
+        })
+      })
+  }
+
+  getProcessTime() {
+    return axios.get(API_ROUTE + "/processtime")
+      .then(response => {
+        console.log(response.data)
+        this.setState({
+          process_time: response.data
         })
       })
   }
@@ -126,8 +197,10 @@ class UploadImgService extends React.Component {
     })
   };
 
-  componentDidMount() {
-    this.getBinaries()
+  async componentDidMount() {
+    await this.getBinaries()
+    await this.getN()
+    this.fillMenu()
   }
 
   fillMenu() {
@@ -138,14 +211,28 @@ class UploadImgService extends React.Component {
     this.setState({
       menuItems: menuItems
     })
-    console.log(this.state.selectedMenuItem)
+
+    let ns = this.state.N;
+    let nItems = ns.map((n) =>
+      <MenuItem value={n.value} key={n.id}>{n.value}</MenuItem>
+    );
+    this.setState({
+      NItems: nItems
+    })
   }
 
-  setBinary(e) {
-    this.setState({
+  async setBinary(e) {
+    await this.setState({
       selectedMenuItem: e.target.value
     })
+    this.uploadBinary()
+  }
 
+  async setN(e) {
+    await this.setState({
+      selectedNItem: e.target.value
+    })
+    this.uploadN()
   }
 
   render() {
@@ -160,6 +247,12 @@ class UploadImgService extends React.Component {
           {this.state.menuItems}
         </Select>
 
+        <InputLabel id="demo-simple-select-label">Number of processes</InputLabel>
+        <Select
+          onChange={this.setN}>
+          {this.state.NItems}
+        </Select>
+
 
 
         <div class="file-field input-field">
@@ -171,10 +264,14 @@ class UploadImgService extends React.Component {
             <img src={this.state.disp_image} onChange={this.handleImageChange} id="image-upload" className="ImageSize" />
             {console.log(this.state.file)}
           </Box>
+          <Box display="flex" justifyContent="center">
+            Computation time: {this.state.process_time}
+          </Box>
+          <Box display="flex" justifyContent="center">
+            <img src={this.state.disp_image_graph} onChange={this.changeDispImageGraph} id="graph-upload" className="ImageSize" />
+          </Box>
           <Box display="flex" justifyContent="center" className="blur">
             <a class="waves-effect waves-light btn" onClick={this.getFile}>Blur</a>
-            <a class="waves-effect waves-light btn" onClick={this.fillMenu}>fill menu</a>
-            <a class="waves-effect waves-light btn" onClick={this.uploadBinary}>send binary</a>
           </Box>
 
         </div>
