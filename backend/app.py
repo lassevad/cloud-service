@@ -65,7 +65,30 @@ def upload_n():
 def process_image(image_id):
     before = datetime.now()
     before_timestamp = datetime.timestamp(before)
-    subprocess.run([binary, "uploads/" + image_id + ".png",
+    if(binary == './mpi-par'):
+        print('MPI running')
+        subprocess.run(["mpirun -n", sel_n, binary, "uploads/" + image_id + ".png",
+                   "uploads/" + image_id + ".png"], capture_output=False)
+    elif(binary == './main-omp2'):
+        print('OpenMP running')
+        if(sel_n == '1'):
+            subprocess.run([binary, "uploads/" + image_id + ".png",
+                   "uploads/" + image_id + ".png"], capture_output=False)
+        elif(sel_n == '2'):
+            subprocess.run(['./main-omp2-2', "uploads/" + image_id + ".png",
+                   "uploads/" + image_id + ".png"], capture_output=False)
+        elif(sel_n == '4'):
+            subprocess.run(['./main-omp2-4', "uploads/" + image_id + ".png",
+                   "uploads/" + image_id + ".png"], capture_output=False)
+        elif(sel_n == '6'):
+            subprocess.run(['./main-omp2-6', "uploads/" + image_id + ".png",
+                   "uploads/" + image_id + ".png"], capture_output=False)
+        elif(sel_n == '8'):
+            subprocess.run(['./main-omp2-8', "uploads/" + image_id + ".png",
+                   "uploads/" + image_id + ".png"], capture_output=False)
+    elif(binary == './main'):
+        print('Sequential running')
+        subprocess.run([binary, "uploads/" + image_id + ".png",
                    "uploads/" + image_id + ".png"], capture_output=False)
     after = datetime.now()
     after_timestamp = datetime.timestamp(after)
