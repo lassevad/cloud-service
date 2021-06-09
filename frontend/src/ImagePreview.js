@@ -247,12 +247,6 @@ class UploadImgService extends React.Component {
           {this.state.menuItems}
         </Select>
 
-        <InputLabel id="demo-simple-select-label">Number of processes</InputLabel>
-        <Select
-          onChange={this.setN}>
-          {this.state.NItems}
-        </Select>
-
 
 
         <div class="file-field input-field">

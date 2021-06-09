@@ -67,29 +67,9 @@ def process_image(image_id):
     before_timestamp = datetime.timestamp(before)
     if(binary == './mpi-par'):
         print('MPI running')
-        subprocess.run(["mpirun -n", sel_n, binary, "uploads/" + image_id + ".png",
+        subprocess.run(["mpirun -n",binary, "uploads/" + image_id + ".png",
                    "uploads/" + image_id + ".png"], capture_output=False)
-    elif(binary == './main-omp2'):
-        print('OpenMP running')
-        if(sel_n == '1'):
-            subprocess.run([binary, "uploads/" + image_id + ".png",
-                   "uploads/" + image_id + ".png"], capture_output=False)
-        elif(sel_n == '2'):
-            subprocess.run(['./main-omp2-2', "uploads/" + image_id + ".png",
-                   "uploads/" + image_id + ".png"], capture_output=False)
-        elif(sel_n == '4'):
-            subprocess.run(['./main-omp2-4', "uploads/" + image_id + ".png",
-                   "uploads/" + image_id + ".png"], capture_output=False)
-        elif(sel_n == '6'):
-            subprocess.run(['./main-omp2-6', "uploads/" + image_id + ".png",
-                   "uploads/" + image_id + ".png"], capture_output=False)
-        elif(sel_n == '8'):
-            subprocess.run(['./main-omp2-8', "uploads/" + image_id + ".png",
-                   "uploads/" + image_id + ".png"], capture_output=False)
-    elif(binary == './main'):
-        print('Sequential running')
-        subprocess.run([binary, "uploads/" + image_id + ".png",
-                   "uploads/" + image_id + ".png"], capture_output=False)
+    subprocess.run([binary, "uploads/" + image_id + ".png", "uploads/" + image_id + ".png"], capture_output=False)
     after = datetime.now()
     after_timestamp = datetime.timestamp(after)
     global process_time
@@ -125,14 +105,20 @@ def download_image():
 def generate_graph():
     global speedup_df
     if(binary=='./main'):
-        speedup_df = speedup_df.append({'Method': 'Sequential', 'N': sel_n, 'time': process_time}, ignore_index=True)
+        speedup_df = speedup_df.append({'Method': 'Sequential', 'N': 0, 'time': process_time}, ignore_index=True)
         print(speedup_df)
     elif(binary=='./mpi-par'):
-        speedup_df = speedup_df.append({'Method': 'MPI', 'N': sel_n, 'time': process_time}, ignore_index=True)
-    elif(binary=='./main-omp2'):
-        speedup_df = speedup_df.append({'Method': 'OpenMP', 'N': sel_n, 'time': process_time}, ignore_index=True)
+        speedup_df = speedup_df.append({'Method': 'MPI', 'N': 0, 'time': process_time}, ignore_index=True)
+    elif(binary=='./main-omp2-2'):
+        speedup_df = speedup_df.append({'Method': 'OpenMP-2', 'N': 0, 'time': process_time}, ignore_index=True)
+    elif(binary=='./main-omp2-4'):
+        speedup_df = speedup_df.append({'Method': 'OpenMP-4', 'N': 0, 'time': process_time}, ignore_index=True)
+    elif(binary=='./main-omp2-6'):
+        speedup_df = speedup_df.append({'Method': 'OpenMP-6', 'N': 0, 'time': process_time}, ignore_index=True)
+    elif(binary=='./main-omp2-8'):
+        speedup_df = speedup_df.append({'Method': 'OpenMP-8', 'N': 0, 'time': process_time}, ignore_index=True)
     print(speedup_df.head())
-    fig = sns.lineplot(data=speedup_df, y=speedup_df['time'], x=speedup_df['N'])
+    fig = sns.barplot(data=speedup_df, y=speedup_df['time'], x=speedup_df['Method'])
 
     filename = "graph.png"
     try:
@@ -160,12 +146,11 @@ def api_all_2():
 
 @ app.route('/processtime', methods=['GET'])
 def get_process_time():
-    print(process_time)
     return jsonify(process_time)
 
 
-
 app.run(host='0.0.0.0', port=8080)
+
 
 
 

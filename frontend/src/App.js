@@ -9,7 +9,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>
-          Graphalicious
+          Image Filtering
         </h1>
         <ImagePrev className="ImageSize" />
       </header>
